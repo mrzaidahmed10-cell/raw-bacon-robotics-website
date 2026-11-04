@@ -4,15 +4,17 @@ Static site for FIRST Tech Challenge team 8743 (Iowa City High School). No build
 
 ## Layout
 
-- `public/*.html`: index, about, season, history, contact, 404
+- `public/*.html`: index, about, robot, season, history, sponsors, contact, 404
 - `public/styles.css`: all styles (colors and spacing are variables at the top)
 - `public/js/site.js`: rail pin, reveals, counters, countdown, photo hotspots
-- `public/js/holes.js`: hero hole-grid canvas
+- `public/js/scenes.js`: the two 3D scenes (hero pin field, mecanum wheel). Loaded only when WebGL works and motion is allowed.
+- `public/js/vendor/`: three.js r187 (MIT), copied unmodified from github.com/mrdoob/three.js
 - `public/assets/`: robot photo, social card, Archivo variable font (SIL OFL, license included)
 
 ## Common edits
 
 - **Add a result:** copy an `<li>` inside the `ol.board` in `season.html` and edit the rank, event, record and stats.
+- **This season's stats:** the hero numbers are labeled as last season (DECODE). Add BIOBUZZ results to `season.html` as FIRST publishes them.
 - **Next-match countdown:** the schedule is the `data-events` list on `#odo` in `index.html`. It picks the next date automatically.
 - **Past seasons:** add a `<details>` block in `history.html`.
 
