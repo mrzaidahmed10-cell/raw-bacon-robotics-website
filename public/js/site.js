@@ -37,7 +37,7 @@
 
   /* Reveal on scroll */
   var hero = document.querySelector(".hero");
-  var revealEls = $("[data-split],[data-r],.rule,.donut-wrap,.timeline li").filter(function (e) { return !(hero && hero.contains(e) && e.hasAttribute("data-split")); });
+  var revealEls = $("[data-split],[data-r],.rule,.donut-wrap,.timeline li").filter(function (e) { return !(hero && hero.contains(e)); });
   if ("IntersectionObserver" in window && !reduce) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
@@ -46,7 +46,8 @@
   } else revealEls.forEach(function (e) { e.classList.add("is-in"); });
 
   /* Hero intro */
-  if (hero) requestAnimationFrame(function () { requestAnimationFrame(function () { hero.classList.add("is-go"); }); });
+  var heroGo = function () { if (!hero || hero.classList.contains("is-go")) return; hero.classList.add("is-go"); hero.classList.add("hit"); setTimeout(function () { hero.classList.remove("hit"); }, 600); };
+  if (hero && !hero.hasAttribute("data-gears")) requestAnimationFrame(function () { requestAnimationFrame(heroGo); });
 
   /* Scroll-linked work: rail pin, header, timeline line, stacked cards */
   var pin = document.querySelector(".rail-pin"), tl = document.querySelector(".timeline"), cards = $(".card");
@@ -96,6 +97,8 @@
   if (odo) {
     var events = JSON.parse(odo.dataset.events), now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate()), next = null;
     events.forEach(function (e) { e.d = new Date(e.date + "T00:00:00"); if (!next && e.d >= today) next = e; });
+    var played = events.filter(function (e) { return e.d < today; }).length, pe = document.getElementById("ev-played"), le = document.getElementById("ev-left");
+    if (pe) pe.textContent = played; if (le) le.textContent = events.length - played;
     var title = document.getElementById("next-title"), sub = document.getElementById("next-sub"), unit = document.getElementById("odo-unit");
     if (!next) {
       odo.closest(".count").hidden = true;
@@ -142,16 +145,51 @@
     });
   }
 
-  /* 3D scenes: only with WebGL, motion allowed, and after the page has settled */
+  /* Hero: gears drop onto the plate. Headline arrives with the first impact. */
   function gl() { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } }
-  var want = { hero: hero && hero.hasAttribute("data-gl"), viewer: document.getElementById("wheel") };
-  if (!reduce && (want.hero || want.viewer) && gl()) {
-    var go = function () {
-      import("./scenes.js").then(function (m) {
-        if (want.hero && m.field(hero)) hero.classList.add("gl");
-        if (want.viewer) m.wheel(want.viewer);
-      }).catch(function () {});
+  if (hero && hero.hasAttribute("data-gears")) {
+    var safety = setTimeout(heroGo, reduce ? 0 : 4200);
+    if (!gl()) { heroGo(); }
+    else {
+      var go = function () {
+        import("./scenes.js").then(function (m) {
+          m.gears(hero, { still: reduce, onImpact: function () { clearTimeout(safety); heroGo(); } });
+          if (reduce) heroGo();
+        }).catch(function () { heroGo(); });
+      };
+      go();
+    }
+  }
+
+  /* Robot page: leader lines from the labels to the parts on the photo */
+  var diagram = document.querySelector(".diagram");
+  if (diagram) {
+    var svg = diagram.querySelector(".leaders"), fig = diagram.querySelector(".dphoto"), img = fig.querySelector("img");
+    var NS = "http://www.w3.org/2000/svg";
+    var draw = function () {
+      svg.textContent = "";
+      if (innerWidth < 832) return;
+      var dr = diagram.getBoundingClientRect(), ir = img.getBoundingClientRect();
+      svg.setAttribute("viewBox", "0 0 " + dr.width + " " + dr.height);
+      $(".part", diagram).forEach(function (p, i) {
+        var lr = p.getBoundingClientRect(), left = p.classList.contains("l");
+        var x1 = (left ? lr.right : lr.left) - dr.left, y1 = lr.top + 18 - dr.top;
+        var x2 = ir.left - dr.left + ir.width * parseFloat(p.dataset.x) / 100, y2 = ir.top - dr.top + ir.height * parseFloat(p.dataset.y) / 100;
+        var mx = x1 + (left ? 28 : -28);
+        var d = "M" + x1 + " " + y1 + " H" + mx + " L" + x2 + " " + y2;
+        ["under", "over"].forEach(function (c) {
+          var path = document.createElementNS(NS, "path"); path.setAttribute("d", d); path.setAttribute("class", "ld " + c);
+          path.style.setProperty("--i", i); svg.appendChild(path);
+          var len = path.getTotalLength(); path.style.setProperty("--len", len);
+        });
+      });
+      if (diagram.classList.contains("is-in")) svg.classList.add("on");
     };
-    if (document.readyState === "complete") setTimeout(go, 150); else addEventListener("load", function () { setTimeout(go, 150); });
+    var ready = function () { draw(); };
+    if (img.complete) ready(); else img.addEventListener("load", ready);
+    addEventListener("resize", draw);
+    if ("IntersectionObserver" in window && !reduce) {
+      new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { diagram.classList.add("is-in"); svg.classList.add("on"); o.disconnect(); } }, { threshold: 0.35 }).observe(diagram);
+    } else { diagram.classList.add("is-in"); svg.classList.add("on"); }
   }
 })();

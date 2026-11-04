@@ -4,17 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The robot | Raw Bacon Robotics #8743</title>
-<meta name="description" content="The Raw Bacon Robotics robot: mecanum drive, perforated aluminum frame, and how the team designs, builds and programs it.">
+<meta name="description" content="The Raw Bacon Robotics robot, part by part: perforated aluminum channel, mecanum wheels, wiring, and how the team designs and builds it.">
 <meta name="theme-color" content="#0b0b0c">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The robot | Raw Bacon Robotics #8743">
-<meta property="og:description" content="The Raw Bacon Robotics robot: mecanum drive, perforated aluminum frame, and how the team designs, builds and programs it.">
+<meta property="og:description" content="The Raw Bacon Robotics robot, part by part: perforated aluminum channel, mecanum wheels, wiring, and how the team designs and builds it.">
 <meta property="og:image" content="assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/archivo-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add("js")</script>
+
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -28,29 +29,20 @@
 </header>
 <main id="main">
 <section class="page-head"><div class="wrap"><span class="rule"></span><h1 data-split>The robot</h1><p class="lead" data-r="rise" style="--d:300ms">Everything on it was designed, built and wired by students at Iowa City High School.</p></div></section>
-<section class="sec sec-ink on-dark" aria-labelledby="mec">
-<div class="wrap drive-grid">
-<div>
-<span class="kicker">Drive</span>
-<h2 id="mec" data-r="blur">Mecanum wheels</h2>
-<p class="lead" data-r="rise" style="margin-top:1.25rem">Each wheel carries rollers set at 45 degrees. Run the wheels in different combinations and the robot drives forward, slides sideways or spins, without ever steering.</p>
-<p data-r="rise" style="color:#b9b9bd">That freedom is why a robot like ours can line up a shot from any angle. Drag the wheel to turn it.</p>
+<section class="sec" aria-labelledby="anat" style="padding-top:1rem">
+<div class="wrap">
+<h2 id="anat" class="sr">Anatomy of the robot</h2>
+<div class="diagram">
+<div class="parts-col l">
+<div class="part l" data-x="22" data-y="17" style="--i:0;--y:17"><h3>Motors and wiring</h3><p>Routed, zip-tied and fused by students. Clean wiring is half of a reliable robot.</p></div>
+<div class="part l" data-x="23" data-y="47" style="--i:1;--y:47"><h3>Perforated channel</h3><p>Holes along the whole length, so parts can bolt on almost anywhere and weight stays low.</p></div>
 </div>
-<div class="viewer" id="wheel" role="img" aria-label="Interactive 3D model of a mecanum wheel"><p class="viewer-note">Illustration, not to scale.</p></div>
+<figure class="dphoto"><img src="assets/robot.webp" width="915" height="1237" alt="Team 8743 robot with blue number plate, perforated aluminum channel, wiring and a mecanum wheel"></figure>
+<div class="parts-col r">
+<div class="part r" data-x="87" data-y="37" style="--i:2;--y:37"><h3>Number plate</h3><p>Every FTC robot wears its team number. Ours is 8743, readable from across the field.</p></div>
+<div class="part r" data-x="79" data-y="76" style="--i:3;--y:76"><h3>Mecanum wheel</h3><p>Rollers set at 45 degrees let the robot drive forward, slide sideways or turn without steering.</p></div>
 </div>
-</section>
-
-<section class="sec" aria-labelledby="anat">
-<div class="wrap drive-grid" style="align-items:start">
-<figure class="photo-wide" style="margin:0" data-r="rise"><img src="assets/robot.webp" width="915" height="1237" alt="Team 8743 robot with blue number plate, perforated aluminum channel, wiring and a mecanum wheel" loading="lazy"></figure>
-<div>
-<div class="sec-head"><span class="kicker">Anatomy</span><h2 id="anat" data-r="blur">What you are looking at</h2></div>
-<ul class="parts" data-stagger="slide">
-<li><b>Number plate</b><span>Every FTC robot wears its team number. Ours is 8743.</span></li>
-<li><b>Mecanum wheel</b><span>Angled rollers let the robot move in any direction.</span></li>
-<li><b>Perforated channel</b><span>Holes along the whole length, so anything can bolt anywhere.</span></li>
-<li><b>Motors and wiring</b><span>Routed, zip-tied and fused by students.</span></li>
-</ul>
+<svg class="leaders" aria-hidden="true"></svg>
 </div>
 </div>
 </section>
@@ -64,7 +56,7 @@
 <li><b>Program</b><span>Java on the REV Control Hub, with an odometry-based autonomous.</span></li>
 <li><b>Tune</b><span>PID tuning and driver-practice telemetry, then back to the shop.</span></li>
 </ul>
-<p class="more">Last season's robot was Baconbot (2024–25, INTO THE DEEP).</p>
+<p class="more">Previous robot: Baconbot (2024–25, INTO THE DEEP).</p>
 </div>
 </section>
 
