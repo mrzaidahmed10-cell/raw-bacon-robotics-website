@@ -13,9 +13,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/archivo-var.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="assets/fonts/plex-sans-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add("js")</script>
-<link rel="preload" href="assets/robot.webp" as="image" type="image/webp">
+<link rel="modulepreload" href="js/scenes.js"><link rel="modulepreload" href="js/vendor/three.module.js"><link rel="modulepreload" href="js/vendor/three.core.js"><link rel="modulepreload" href="js/vendor/RoomEnvironment.js">
 </head>
 <body class="home">
 <a class="skip" href="#main">Skip to content</a>
@@ -29,25 +30,26 @@
 </header>
 <main id="main">
 
-<section class="hero" aria-labelledby="h1">
+<section class="hero" aria-labelledby="h1" data-hero>
 <div class="hero-bg" aria-hidden="true"></div>
-<svg class="hero-gears" viewBox="0 0 640 640" aria-hidden="true" focusable="false"></svg>
-<div class="wrap hero-grid">
-<div class="hero-copy">
-<span class="rule"></span>
-<p class="eyebrow" data-r="rise" style="--d:150ms">FIRST Tech Challenge · Team 8743 · Since 2014</p>
-<h1 id="h1" data-split><span class="line">Raw Bacon</span><span class="line">Robotics</span></h1>
-<p class="lead" data-r="rise" style="--d:650ms">Students at Iowa City High School who design, build, program and drive their own robots.</p>
-<div class="actions" data-r="rise" style="--d:800ms"><a class="btn" href="season.html">This season</a><a class="btn btn-line" href="robot.html">Meet the robot</a></div>
+<div class="wrap hero-in">
+<p class="eyebrow" data-t="read">FIRST Tech Challenge · Team 8743 · Since 2014</p>
+<h1 id="h1" class="hero-title" aria-label="Raw Bacon Robotics"><span class="ln" aria-hidden="true"><span class="wd"><span class="ch">R</span><span class="ch">a</span><span class="ch">w</span></span> <span class="wd"><span class="ch">B</span><span class="ch">a</span><span class="ch">c</span><span class="ch">o</span><span class="ch">n</span></span></span><span class="ln" aria-hidden="true"><span class="ch">R</span><span class="ch">o</span><span class="ch">b</span><span class="ch">o</span><span class="ch">t</span><span class="ch ix">ı</span><span class="bl"></span><span class="ch">c</span><span class="ch">s</span></span></h1>
+<div class="hero-sub" data-t="wipe"><p class="lead">Students at Iowa City High School who design, build, program and drive their own robots.</p><div class="actions"><a class="btn" href="season.html">This season</a><a class="btn btn-line" href="robot.html">Meet the robot</a></div></div>
 </div>
-<figure class="hero-robot">
-<div class="frame"><img src="assets/robot.webp" width="915" height="1237" fetchpriority="high" alt="Our robot on the pit cart: aluminum channel frame, a drive motor with wiring, the blue 8743 number plate and a yellow mecanum wheel">
+</section>
+
+<section class="robot-pop on-dark" id="robot" data-pop aria-labelledby="rp-h">
+<div class="rp-stick">
+<div class="wrap rp-grid">
+<div class="rp-copy"><span class="kicker">The robot</span><h2 id="rp-h" data-t="mask">Built by students, bolt by bolt.</h2><p class="lead">Perforated aluminum channel, mecanum wheels and wiring the team routes itself. Every part on it was designed, built or chosen by students.</p><div class="actions"><a class="btn" href="robot.html">See it part by part</a></div></div>
+<figure class="rp-fig"><div class="frame"><img src="assets/robot.webp" width="915" height="1237" loading="lazy" alt="Our robot on the pit cart: aluminum channel frame, a drive motor with wiring, the blue 8743 number plate and a yellow mecanum wheel">
 <div class="callouts" aria-hidden="true">
 <span class="co" style="--x:22;--y:17;--h:46px;--c:0"><i></i><b>Drive motor</b></span>
 <span class="co r" style="--x:87;--y:36;--h:40px;--c:1"><i></i><b>Team plate</b></span>
 <span class="co d r" style="--x:79;--y:76;--h:34px;--c:2"><i></i><b>Mecanum wheel</b></span>
-</div></div>
-</figure>
+</div></div></figure>
+</div>
 </div>
 </section>
 
@@ -77,12 +79,6 @@
 </div>
 </section>
 
-<section class="sec" aria-labelledby="rb-h">
-<div class="wrap band">
-<figure class="photo narrow" data-r="rise" style="--d:0ms"><img src="assets/robot.webp" width="915" height="1237" alt="Team 8743 robot: blue number plate reading 8743, perforated aluminum channel and a mecanum wheel" loading="lazy"><figcaption>Team 8743's robot.</figcaption></figure>
-<div><span class="kicker">The robot</span><h2 id="rb-h">Built by students, bolt by bolt.</h2><p class="lead" style="margin-top:1.25rem">Perforated aluminum channel, mecanum wheels and wiring the team routes itself. Every part on it was designed, built or chosen by students.</p><div class="actions"><a class="btn" href="robot.html">Meet the robot</a></div></div>
-</div>
-</section>
 
 <section class="sec sec-paper" aria-labelledby="aw-h">
 <div class="wrap">
@@ -114,7 +110,7 @@
 
 <section class="sec sec-red" aria-labelledby="sp-h">
 <div class="wrap sponsor-big">
-<div><h2 id="sp-h">Built with help.</h2><p class="lead" style="margin-top:1.25rem">Sponsorship pays for parts, registration and travel. A mentor with engineering, software, machining or business experience can change a season with an hour a week.</p><div class="actions"><a class="btn" href="sponsors.html">Support the team</a></div></div>
+<div><h2 id="sp-h" data-t="wipe">Built with help.</h2><p class="lead" style="margin-top:1.25rem">Sponsorship pays for parts, registration and travel. A mentor with engineering, software, machining or business experience can change a season with an hour a week.</p><div class="actions"><a class="btn" href="sponsors.html">Support the team</a></div></div>
 <div><p class="kicker-s">Our sponsors</p><ul class="sponsor-logos"><li><img src="assets/sponsor-rtx.png" width="169" height="70" alt="RTX" loading="lazy"></li><li><img src="assets/sponsor-midamerican.png" width="92" height="60" alt="MidAmerican Energy" loading="lazy"></li></ul></div>
 </div>
 </section>

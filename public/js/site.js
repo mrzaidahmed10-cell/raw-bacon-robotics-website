@@ -11,7 +11,7 @@
   }
 
   /* Split headings into words for the mask-rise */
-  $("[data-split]").forEach(function (h) {
+  $('[data-t="mask"]').forEach(function (h) {
     var k = 0;
     (function walk(node) {
       Array.prototype.slice.call(node.childNodes).forEach(function (n) {
@@ -36,17 +36,13 @@
 
   /* Reveal on scroll */
   var hero = document.querySelector(".hero");
-  var revealEls = $("[data-split],[data-r],.rule,.donut-wrap,.timeline li").filter(function (e) { return !(hero && hero.contains(e)); });
+  var revealEls = $('[data-t="mask"],[data-t="wipe"],[data-r],.rule,.timeline li').filter(function (e) { return !(hero && hero.contains(e)); });
   if ("IntersectionObserver" in window && !reduce) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
     }, { threshold: 0.18, rootMargin: "0px 0px -6% 0px" });
     revealEls.forEach(function (e) { io.observe(e); });
   } else revealEls.forEach(function (e) { e.classList.add("is-in"); });
-
-  /* Hero intro */
-  var heroGo = function () { if (!hero || hero.classList.contains("is-go")) return; hero.classList.add("is-go"); };
-  if (hero && !hero.querySelector(".hero-robot")) requestAnimationFrame(function () { requestAnimationFrame(heroGo); });
 
   /* Scroll-linked work: rail pin, header, timeline line, stacked cards */
   var pin = document.querySelector(".rail-pin"), tl = document.querySelector(".timeline"); 
@@ -112,61 +108,75 @@
     }
   }
 
-  /* Hero: the photo wipes in, callouts draw, two gears start turning, depth follows the pointer */
-  var heroRobot = hero && hero.querySelector(".hero-robot");
-  if (heroRobot) {
-    var himg = heroRobot.querySelector("img"), started = false;
-    var start = function () { if (started) return; started = true; heroGo(); };
-    if (himg.complete) start(); else { himg.addEventListener("load", start); himg.addEventListener("error", start); setTimeout(start, 1500); }
-
-    /* gear pair, drawn as CAD outlines */
-    var svg = hero.querySelector(".hero-gears"), NS = "http://www.w3.org/2000/svg";
-    var N1 = 30, N2 = 18, R1 = 190, R2 = R1 * N2 / N1, phi = -0.62; /* centre line, radians */
-    var c1 = { x: 250, y: 330 }, c2 = { x: c1.x + (R1 + R2) * Math.cos(phi), y: c1.y + (R1 + R2) * Math.sin(phi) };
-    var tooth = function (N, R) {
-      var p = 2 * Math.PI / N, add = 2 * Math.PI / N * 0, ro = R + R * 0.14, ri = R - R * 0.17, d = "";
-      var pt = function (r, a) { return (r * Math.cos(a)).toFixed(2) + " " + (r * Math.sin(a)).toFixed(2); };
-      for (var k = 0; k < N; k++) {
-        var a = k * p;
-        d += (k ? "L" : "M") + pt(ri, a - 0.5 * p) + "L" + pt(ri, a - 0.31 * p) + "L" + pt(ro, a - 0.15 * p) + "L" + pt(ro, a + 0.15 * p) + "L" + pt(ri, a + 0.31 * p) + "L" + pt(ri, a + 0.5 * p);
-      }
-      return d + "Z";
+  /* Typed readout (technical labels): used on the hero eyebrow only */
+  function typeOut(el, delay) {
+    var full = el.textContent;
+    if (reduce) return;
+    el.textContent = ""; el.classList.add("typing"); el.setAttribute("aria-label", full);
+    var i = 0, step = function () {
+      el.textContent = full.slice(0, ++i);
+      if (i < full.length) setTimeout(step, 22 + Math.random() * 26); else el.classList.remove("typing");
     };
-    var mk = function (n, attrs, parent) { var e = document.createElementNS(NS, n); for (var k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
-    var holes = function (g, R, n, r0, rr) { for (var i = 0; i < n; i++) { var a = i * 2 * Math.PI / n; mk("circle", { cx: (r0 * Math.cos(a)).toFixed(2), cy: (r0 * Math.sin(a)).toFixed(2), r: rr, class: "g" }, g); } };
-    var g1 = mk("g", {}), g2 = mk("g", {});
-    mk("path", { d: tooth(N1, R1), class: "g", "fill-rule": "evenodd" }, g1); mk("circle", { r: 26, class: "g" }, g1); holes(g1, R1, 6, R1 * 0.56, 30);
-    mk("path", { d: tooth(N2, R2), class: "g g2", "fill-rule": "evenodd" }, g2); mk("circle", { r: 18, class: "g g2" }, g2); holes(g2, R2, 5, R2 * 0.55, 17);
-    mk("circle", { cx: c1.x, cy: c1.y, r: R1, class: "pc" }); mk("circle", { cx: c2.x, cy: c2.y, r: R2, class: "pc" });
-    var place = function (t1) {
-      var t2 = phi + Math.PI - (N1 / N2) * (t1 - phi) - Math.PI / N2;
-      g1.setAttribute("transform", "translate(" + c1.x + " " + c1.y + ") rotate(" + (t1 * 180 / Math.PI).toFixed(3) + ")");
-      g2.setAttribute("transform", "translate(" + c2.x.toFixed(2) + " " + c2.y.toFixed(2) + ") rotate(" + (t2 * 180 / Math.PI).toFixed(3) + ")");
-    };
-    place(0.3);
-
-    if (!reduce) {
-      var tx = 0, ty = 0, cx = 0, cy = 0, th = 0.3, speed = 0, last = 0, live = true, t0 = 0;
-      var raf = 0;
-      new IntersectionObserver(function (es) { live = es[0].isIntersecting; if (live && !raf) { last = 0; raf = requestAnimationFrame(loop); } }).observe(hero);
-      if (matchMedia("(pointer: fine)").matches) addEventListener("pointermove", function (e) { tx = (e.clientX / innerWidth - 0.5) * 2; ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
-      var loop = function (now) {
-        raf = 0;
-        if (!live) return;
-        if (!t0) t0 = now;
-        var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
-        /* gears spin up from rest to a slow, steady turn */
-        speed += (0.3 * Math.min(1, (now - t0) / 2200) - speed) * Math.min(1, dt * 2.5);
-        th += speed * dt;
-        place(th + scrollY * 0.0035);
-        cx += (tx - cx) * Math.min(1, dt * 3); cy += (ty - cy) * Math.min(1, dt * 3);
-        hero.style.setProperty("--px", cx.toFixed(4)); hero.style.setProperty("--py", cy.toFixed(4));
-        hero.style.setProperty("--sy", Math.min(scrollY, innerHeight) * 0.08);
-        raf = requestAnimationFrame(loop);
-      };
-      raf = requestAnimationFrame(loop);
-    }
+    setTimeout(step, delay);
   }
+
+  /* Hero intro: a machined gear falls onto the "i" in Robotics and becomes its dot; the title then rises out of its masks from that point */
+  if (hero && hero.hasAttribute("data-hero")) {
+    var title = hero.querySelector(".hero-title"), ix = title.querySelector(".ix"), bl = title.querySelector(".bl"), eb = hero.querySelector(".eyebrow");
+    var navType = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] || {}).type;
+    var fromSite = navType === "navigate" && document.referrer && (function () { try { return new URL(document.referrer).origin === location.origin; } catch (e) { return false; } })();
+    var instant = reduce || fromSite;
+    var markHit = function () {
+      if (hero.classList.contains("is-hit")) return;
+      /* each letter starts as the shock reaches it: nearest to the gear first */
+      var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), cx = ir.left + ir.width / 2, cy = ir.top;
+      $(".ch", title).forEach(function (c) {
+        var r = c.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - cx, (r.top - cy) * 1.4);
+        c.style.setProperty("--d", Math.round(d / Math.max(600, hr.width) * 650) + "ms");
+      });
+      hero.classList.add("is-hit");
+    };
+    var measure = function () {
+      var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), br = bl.getBoundingClientRect();
+      var fs = parseFloat(getComputedStyle(title).fontSize);
+      return { x: ir.left + ir.width / 2 + fs * 0.0225 - hr.left, stemY: br.top - hr.top - fs * 0.526, R: fs * (innerWidth < 640 ? 0.24 : 0.27) };
+    };
+    var ctl = null, started = false;
+    var finish = function () { if (ctl) ctl.finish(); hero.classList.add("is-instant", "is-stem", "is-hit"); if (eb && eb.classList.contains("typing")) { eb.classList.remove("typing"); eb.textContent = eb.getAttribute("aria-label"); } };
+    var begin = function () {
+      if (started) return; started = true;
+      if (!gl()) { hero.classList.add("no-gl"); if (instant) { finish(); return; } setTimeout(function () { hero.classList.add("is-stem"); }, 300); setTimeout(markHit, 900); return; }
+      import("./scenes.js").then(function (m) {
+        ctl = m.dot(hero, { still: instant, measure: measure, onStem: function () { hero.classList.add("is-stem"); }, onHit: markHit });
+        if (instant) finish();
+        else {
+          var skip = function () { removeEventListener("pointerdown", skip); removeEventListener("keydown", skip); finish(); };
+          addEventListener("pointerdown", skip); addEventListener("keydown", skip);
+          addEventListener("wheel", skip, { once: true, passive: true });
+        }
+      }).catch(function () { hero.classList.add("no-gl"); if (instant) finish(); else { hero.classList.add("is-stem"); setTimeout(markHit, 500); } });
+    };
+    if (instant) hero.classList.add("is-instant"); else typeOut(eb, 150);
+    var ready = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 1500); })]) : Promise.resolve();
+    ready.then(function () { requestAnimationFrame(begin); });
+  }
+
+  function gl() { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } }
+
+  /* Robot photo: climbs into view as the section scrolls past */
+  var pop = document.querySelector("[data-pop]");
+  if (pop && !reduce) {
+    var easeOut = function (x) { return 1 - Math.pow(1 - x, 3); };
+    var popTick = function () {
+      var r = pop.getBoundingClientRect(), span = pop.offsetHeight - innerHeight;
+      var p = span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 1;
+      var a = easeOut(Math.max(0, Math.min(1, p / 0.5)));
+      pop.style.setProperty("--a", a.toFixed(4));
+      pop.classList.toggle("is-pop", a > 0.97);
+    };
+    addEventListener("scroll", function () { requestAnimationFrame(popTick); }, { passive: true });
+    addEventListener("resize", popTick); popTick();
+  } else if (pop) { pop.classList.add("is-pop", "pop-static"); }
 
   /* Robot page: leader lines from the labels to the parts on the photo */
   var diagram = document.querySelector(".diagram");
