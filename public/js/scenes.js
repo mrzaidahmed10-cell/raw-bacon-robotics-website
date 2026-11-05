@@ -74,7 +74,7 @@ export function gears(host, opts) {
   key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = -30; key.shadow.camera.right = 30; key.shadow.camera.top = 30; key.shadow.camera.bottom = -30;
   key.shadow.camera.near = 5; key.shadow.camera.far = 80; key.shadow.bias = -0.0004; key.shadow.normalBias = 0.03; key.shadow.radius = 4;
   scene.add(key);
-  const rim = new THREE.PointLight(0xd4161c, 650, 60, 2); rim.position.set(14, 5, 6); scene.add(rim);
+  const rim = new THREE.PointLight(0xd4161c, 260, 60, 2); rim.position.set(14, 5, 6); scene.add(rim);
 
   /* plate */
   const tex = plateTextures(renderer);
@@ -166,7 +166,7 @@ export function gears(host, opts) {
   function setBolt(g, k) { const s = Math.max(0.001, k); g.bolt.scale.setScalar(s); g.washer.scale.setScalar(s); }
   function land(g, i) {
     g.tLand = T; impacts++; if (i === 0) { th1 = g.theta; w1 = g.wFree; }
-    addRing(g.x, g.z, i === 0); burst(g.x, g.z, i === 0 ? 1 : 0.7); shake = Math.max(shake, i === 0 ? 1 : i === 1 ? 0.55 : 0.35);
+    shake = Math.max(shake, i === 0 ? 0.6 : i === 1 ? 0.3 : 0.2);
     g.popT = T + 0.12;
     if (i === 0 && opts.onImpact) opts.onImpact(i);
   }
@@ -184,7 +184,7 @@ export function gears(host, opts) {
           if (g.y <= REST) {
             g.y = REST;
             if (!g.tLand) land(g, i);
-            if (Math.abs(g.vy) > 4 && g.bounces < 2) { g.vy = -g.vy * 0.24; g.bounces++; } else { g.vy = 0; g.settled = true; }
+            if (Math.abs(g.vy) > 4 && g.bounces < 1) { g.vy = -g.vy * 0.24; g.bounces++; } else { g.vy = 0; g.settled = true; }
           }
         }
         if (g.started) {
@@ -206,17 +206,6 @@ export function gears(host, opts) {
         g.mesh.rotation.y = g.theta;
         if (g.popT > 0 && T >= g.popT) { const k = Math.min(1, (T - g.popT) / 0.3); setBolt(g, k >= 1 ? 1 : ease(0, 1, k) * 1.12); }
       });
-      /* effects */
-      for (let i = rings.length - 1; i >= 0; i--) {
-        const r = rings[i]; r.t += dt; const k = r.t / 1.1, s = (r.big ? 3 : 2) + k * (r.big ? 24 : 15);
-        r.m.scale.set(s, s, 1); r.m.material.opacity = 0.85 * (1 - k) * (1 - k);
-        if (k >= 1) { root.remove(r.m); r.m.geometry.dispose(); r.m.material.dispose(); rings.splice(i, 1); }
-      }
-      if (spkT < 1.2) {
-        spkT += dt;
-        for (let i = 0; i < SPK; i++) { spkVel[i * 3 + 1] -= 30 * dt; for (let a = 0; a < 3; a++) spkPos[i * 3 + a] += spkVel[i * 3 + a] * dt; if (spkPos[i * 3 + 1] < 0.1) { spkPos[i * 3 + 1] = 0.1; spkVel[i * 3 + 1] *= -0.2; } }
-        spkGeo.attributes.position.needsUpdate = true; sparks.material.opacity = Math.max(0, 1 - spkT / 1.0);
-      } else sparks.material.opacity = 0;
       shake *= Math.exp(-dt * 7);
     } else {
       list.forEach((g, i) => {

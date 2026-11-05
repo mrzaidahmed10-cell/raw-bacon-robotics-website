@@ -33,7 +33,6 @@
 
   /* Stagger children */
   $("[data-stagger]").forEach(function (p) { Array.prototype.forEach.call(p.children, function (c, i) { c.style.setProperty("--i", i); c.setAttribute("data-r", p.getAttribute("data-stagger") || "rise"); }); });
-  $(".board").forEach(function (b) { Array.prototype.forEach.call(b.children, function (c, i) { c.style.setProperty("--i", i); c.setAttribute("data-r", "slide"); }); });
 
   /* Reveal on scroll */
   var hero = document.querySelector(".hero");
@@ -46,11 +45,11 @@
   } else revealEls.forEach(function (e) { e.classList.add("is-in"); });
 
   /* Hero intro */
-  var heroGo = function () { if (!hero || hero.classList.contains("is-go")) return; hero.classList.add("is-go"); hero.classList.add("hit"); setTimeout(function () { hero.classList.remove("hit"); }, 600); };
+  var heroGo = function () { if (!hero || hero.classList.contains("is-go")) return; hero.classList.add("is-go"); };
   if (hero && !hero.hasAttribute("data-gears")) requestAnimationFrame(function () { requestAnimationFrame(heroGo); });
 
   /* Scroll-linked work: rail pin, header, timeline line, stacked cards */
-  var pin = document.querySelector(".rail-pin"), tl = document.querySelector(".timeline"), cards = $(".card");
+  var pin = document.querySelector(".rail-pin"), tl = document.querySelector(".timeline"); 
   var ticking = false;
   function onScroll() {
     ticking = false;
@@ -66,17 +65,9 @@
       var r = tl.getBoundingClientRect();
       tl.style.setProperty("--p", Math.max(0, Math.min(1, (innerHeight * 0.65 - r.top) / r.height)).toFixed(3));
     }
-    if (cards.length && !reduce && innerWidth >= 832) {
-      cards.forEach(function (c, i) {
-        var nx = cards[i + 1]; var s = 1;
-        if (nx) { var a = c.getBoundingClientRect(), b = nx.getBoundingClientRect(); s = 1 - 0.05 * Math.max(0, Math.min(1, 1 - (b.top - a.top) / a.height)); }
-        c.style.setProperty("--sc", s.toFixed(3));
-      });
-    }
   }
   addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
   addEventListener("resize", onScroll);
-  cards.forEach(function (c, i) { c.style.setProperty("--n", i); });
   onScroll();
 
   /* Count-up */
@@ -121,30 +112,6 @@
     }
   }
 
-  if (!reduce) {
-    /* Photo tilt with a moving sheen */
-    $(".mount").forEach(function (m) {
-      var shot = m.querySelector(".shot");
-      m.addEventListener("pointermove", function (e) {
-        if (e.pointerType === "touch") return;
-        var r = m.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        m.classList.add("is-live");
-        m.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg"); m.style.setProperty("--rx", ((0.5 - y) * 7).toFixed(2) + "deg");
-        shot.style.setProperty("--sx", x * 100 + "%"); shot.style.setProperty("--sy", y * 100 + "%"); shot.style.setProperty("--so", 1);
-      });
-      m.addEventListener("pointerleave", function () { m.style.setProperty("--ry", "0deg"); m.style.setProperty("--rx", "0deg"); shot.style.setProperty("--so", 0); });
-    });
-    /* Cursor spotlight on cards */
-    $(".spot").forEach(function (c) {
-      c.addEventListener("pointermove", function (e) { var r = c.getBoundingClientRect(); c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px"); });
-    });
-    /* Magnetic buttons */
-    if (matchMedia("(hover: hover)").matches) $(".actions .btn, .sponsor-big .btn").forEach(function (b) {
-      b.addEventListener("pointermove", function (e) { var r = b.getBoundingClientRect(); b.style.transform = "translate(" + ((e.clientX - r.left - r.width / 2) * 0.12).toFixed(1) + "px," + ((e.clientY - r.top - r.height / 2) * 0.2).toFixed(1) + "px)"; });
-      b.addEventListener("pointerleave", function () { b.style.transform = ""; });
-    });
-  }
-
   /* Hero: gears drop onto the plate. Headline arrives with the first impact. */
   function gl() { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } }
   if (hero && hero.hasAttribute("data-gears")) {
@@ -173,7 +140,7 @@
       svg.setAttribute("viewBox", "0 0 " + dr.width + " " + dr.height);
       $(".part", diagram).forEach(function (p, i) {
         var lr = p.getBoundingClientRect(), left = p.classList.contains("l");
-        var x1 = (left ? lr.right : lr.left) - dr.left, y1 = lr.top + 18 - dr.top;
+        var x1 = (left ? lr.right + 10 : lr.left - 10) - dr.left, y1 = lr.top + 18 - dr.top;
         var x2 = ir.left - dr.left + ir.width * parseFloat(p.dataset.x) / 100, y2 = ir.top - dr.top + ir.height * parseFloat(p.dataset.y) / 100;
         var mx = x1 + (left ? 28 : -28);
         var d = "M" + x1 + " " + y1 + " H" + mx + " L" + x2 + " " + y2;
@@ -191,5 +158,23 @@
     if ("IntersectionObserver" in window && !reduce) {
       new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { diagram.classList.add("is-in"); svg.classList.add("on"); o.disconnect(); } }, { threshold: 0.35 }).observe(diagram);
     } else { diagram.classList.add("is-in"); svg.classList.add("on"); }
+  }
+
+  /* Shop: totals and an email order (no payment is taken on the site) */
+  var shop = document.querySelector("[data-shop]");
+  if (shop) {
+    var rows = $("[data-product]", shop), sum = document.getElementById("sum"), go = document.getElementById("order");
+    var email = shop.dataset.email, update = function () {
+      var total = 0, lines = [];
+      rows.forEach(function (r) {
+        var q = Math.max(0, Math.min(20, parseInt(r.querySelector("input").value, 10) || 0)), p = parseFloat(r.dataset.price), sel = r.querySelector("select");
+        var t = q * p; total += t; r.querySelector(".line-total").textContent = q ? q + " x $" + p + " = $" + t : "";
+        if (q) lines.push(q + " x " + r.dataset.product + (sel ? " (" + sel.value + ")" : "") + " at $" + p);
+      });
+      sum.textContent = "$" + total;
+      if (total) { go.removeAttribute("aria-disabled"); go.href = "mailto:" + email + "?subject=" + encodeURIComponent("Shop order") + "&body=" + encodeURIComponent("Hi Raw Bacon Robotics,\n\nI would like to order:\n" + lines.join("\n") + "\nTotal: $" + total + "\n\nName:\nPickup or delivery details:\n"); }
+      else { go.setAttribute("aria-disabled", "true"); go.removeAttribute("href"); }
+    };
+    shop.addEventListener("input", update); update();
   }
 })();
