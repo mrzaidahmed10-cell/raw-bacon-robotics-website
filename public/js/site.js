@@ -46,7 +46,7 @@
 
   /* Hero intro */
   var heroGo = function () { if (!hero || hero.classList.contains("is-go")) return; hero.classList.add("is-go"); };
-  if (hero && !hero.hasAttribute("data-gears")) requestAnimationFrame(function () { requestAnimationFrame(heroGo); });
+  if (hero && !hero.querySelector(".hero-robot")) requestAnimationFrame(function () { requestAnimationFrame(heroGo); });
 
   /* Scroll-linked work: rail pin, header, timeline line, stacked cards */
   var pin = document.querySelector(".rail-pin"), tl = document.querySelector(".timeline"); 
@@ -112,19 +112,59 @@
     }
   }
 
-  /* Hero: gears drop onto the plate. Headline arrives with the first impact. */
-  function gl() { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } }
-  if (hero && hero.hasAttribute("data-gears")) {
-    var safety = setTimeout(heroGo, reduce ? 0 : 4200);
-    if (!gl()) { heroGo(); }
-    else {
-      var go = function () {
-        import("./scenes.js").then(function (m) {
-          m.gears(hero, { still: reduce, onImpact: function () { clearTimeout(safety); heroGo(); } });
-          if (reduce) heroGo();
-        }).catch(function () { heroGo(); });
+  /* Hero: the photo wipes in, callouts draw, two gears start turning, depth follows the pointer */
+  var heroRobot = hero && hero.querySelector(".hero-robot");
+  if (heroRobot) {
+    var himg = heroRobot.querySelector("img"), started = false;
+    var start = function () { if (started) return; started = true; heroGo(); };
+    if (himg.complete) start(); else { himg.addEventListener("load", start); himg.addEventListener("error", start); setTimeout(start, 1500); }
+
+    /* gear pair, drawn as CAD outlines */
+    var svg = hero.querySelector(".hero-gears"), NS = "http://www.w3.org/2000/svg";
+    var N1 = 30, N2 = 18, R1 = 190, R2 = R1 * N2 / N1, phi = -0.62; /* centre line, radians */
+    var c1 = { x: 250, y: 330 }, c2 = { x: c1.x + (R1 + R2) * Math.cos(phi), y: c1.y + (R1 + R2) * Math.sin(phi) };
+    var tooth = function (N, R) {
+      var p = 2 * Math.PI / N, add = 2 * Math.PI / N * 0, ro = R + R * 0.14, ri = R - R * 0.17, d = "";
+      var pt = function (r, a) { return (r * Math.cos(a)).toFixed(2) + " " + (r * Math.sin(a)).toFixed(2); };
+      for (var k = 0; k < N; k++) {
+        var a = k * p;
+        d += (k ? "L" : "M") + pt(ri, a - 0.5 * p) + "L" + pt(ri, a - 0.31 * p) + "L" + pt(ro, a - 0.15 * p) + "L" + pt(ro, a + 0.15 * p) + "L" + pt(ri, a + 0.31 * p) + "L" + pt(ri, a + 0.5 * p);
+      }
+      return d + "Z";
+    };
+    var mk = function (n, attrs, parent) { var e = document.createElementNS(NS, n); for (var k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+    var holes = function (g, R, n, r0, rr) { for (var i = 0; i < n; i++) { var a = i * 2 * Math.PI / n; mk("circle", { cx: (r0 * Math.cos(a)).toFixed(2), cy: (r0 * Math.sin(a)).toFixed(2), r: rr, class: "g" }, g); } };
+    var g1 = mk("g", {}), g2 = mk("g", {});
+    mk("path", { d: tooth(N1, R1), class: "g", "fill-rule": "evenodd" }, g1); mk("circle", { r: 26, class: "g" }, g1); holes(g1, R1, 6, R1 * 0.56, 30);
+    mk("path", { d: tooth(N2, R2), class: "g g2", "fill-rule": "evenodd" }, g2); mk("circle", { r: 18, class: "g g2" }, g2); holes(g2, R2, 5, R2 * 0.55, 17);
+    mk("circle", { cx: c1.x, cy: c1.y, r: R1, class: "pc" }); mk("circle", { cx: c2.x, cy: c2.y, r: R2, class: "pc" });
+    var place = function (t1) {
+      var t2 = phi + Math.PI - (N1 / N2) * (t1 - phi) - Math.PI / N2;
+      g1.setAttribute("transform", "translate(" + c1.x + " " + c1.y + ") rotate(" + (t1 * 180 / Math.PI).toFixed(3) + ")");
+      g2.setAttribute("transform", "translate(" + c2.x.toFixed(2) + " " + c2.y.toFixed(2) + ") rotate(" + (t2 * 180 / Math.PI).toFixed(3) + ")");
+    };
+    place(0.3);
+
+    if (!reduce) {
+      var tx = 0, ty = 0, cx = 0, cy = 0, th = 0.3, speed = 0, last = 0, live = true, t0 = 0;
+      var raf = 0;
+      new IntersectionObserver(function (es) { live = es[0].isIntersecting; if (live && !raf) { last = 0; raf = requestAnimationFrame(loop); } }).observe(hero);
+      if (matchMedia("(pointer: fine)").matches) addEventListener("pointermove", function (e) { tx = (e.clientX / innerWidth - 0.5) * 2; ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
+      var loop = function (now) {
+        raf = 0;
+        if (!live) return;
+        if (!t0) t0 = now;
+        var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
+        /* gears spin up from rest to a slow, steady turn */
+        speed += (0.3 * Math.min(1, (now - t0) / 2200) - speed) * Math.min(1, dt * 2.5);
+        th += speed * dt;
+        place(th + scrollY * 0.0035);
+        cx += (tx - cx) * Math.min(1, dt * 3); cy += (ty - cy) * Math.min(1, dt * 3);
+        hero.style.setProperty("--px", cx.toFixed(4)); hero.style.setProperty("--py", cy.toFixed(4));
+        hero.style.setProperty("--sy", Math.min(scrollY, innerHeight) * 0.08);
+        raf = requestAnimationFrame(loop);
       };
-      go();
+      raf = requestAnimationFrame(loop);
     }
   }
 

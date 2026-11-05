@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/archivo-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add("js")</script>
-<link rel="modulepreload" href="js/scenes.js"><link rel="modulepreload" href="js/vendor/three.module.js"><link rel="modulepreload" href="js/vendor/three.core.js"><link rel="modulepreload" href="js/vendor/RoomEnvironment.js">
+<link rel="preload" href="assets/robot.webp" as="image" type="image/webp">
 </head>
 <body class="home">
 <a class="skip" href="#main">Skip to content</a>
@@ -29,13 +29,26 @@
 </header>
 <main id="main">
 
-<section class="hero" data-gears aria-labelledby="h1">
-<div class="wrap"><div class="hero-copy">
+<section class="hero" aria-labelledby="h1">
+<div class="hero-bg" aria-hidden="true"></div>
+<svg class="hero-gears" viewBox="0 0 640 640" aria-hidden="true" focusable="false"></svg>
+<div class="wrap hero-grid">
+<div class="hero-copy">
 <span class="rule"></span>
+<p class="eyebrow" data-r="rise" style="--d:150ms">FIRST Tech Challenge · Team 8743 · Since 2014</p>
 <h1 id="h1" data-split><span class="line">Raw Bacon</span><span class="line">Robotics</span></h1>
-<p class="lead" data-r="rise" style="--d:600ms">FIRST Tech Challenge team 8743. Students at Iowa City High School who design, build, program and drive their own robots, every season since 2014.</p>
-<div class="actions" data-r="rise" style="--d:750ms"><a class="btn" href="season.html">This season</a><a class="btn btn-line" href="robot.html">Meet the robot</a></div>
+<p class="lead" data-r="rise" style="--d:650ms">Students at Iowa City High School who design, build, program and drive their own robots.</p>
+<div class="actions" data-r="rise" style="--d:800ms"><a class="btn" href="season.html">This season</a><a class="btn btn-line" href="robot.html">Meet the robot</a></div>
+</div>
+<figure class="hero-robot">
+<div class="frame"><img src="assets/robot.webp" width="915" height="1237" fetchpriority="high" alt="Our robot on the pit cart: aluminum channel frame, a drive motor with wiring, the blue 8743 number plate and a yellow mecanum wheel">
+<div class="callouts" aria-hidden="true">
+<span class="co" style="--x:22;--y:17;--h:46px;--c:0"><i></i><b>Drive motor</b></span>
+<span class="co r" style="--x:87;--y:36;--h:40px;--c:1"><i></i><b>Team plate</b></span>
+<span class="co d r" style="--x:79;--y:76;--h:34px;--c:2"><i></i><b>Mecanum wheel</b></span>
 </div></div>
+</figure>
+</div>
 </section>
 
 <section class="sec sec-paper" aria-labelledby="next-h">
@@ -102,7 +115,7 @@
 <section class="sec sec-red" aria-labelledby="sp-h">
 <div class="wrap sponsor-big">
 <div><h2 id="sp-h">Built with help.</h2><p class="lead" style="margin-top:1.25rem">Sponsorship pays for parts, registration and travel. A mentor with engineering, software, machining or business experience can change a season with an hour a week.</p><div class="actions"><a class="btn" href="sponsors.html">Support the team</a></div></div>
-<div><ul class="sponsor-names"><li><p>Our sponsors</p>RTX</li><li>MidAmerican Energy</li></ul></div>
+<div><p class="kicker-s">Our sponsors</p><ul class="sponsor-logos"><li><img src="assets/sponsor-rtx.png" width="169" height="70" alt="RTX" loading="lazy"></li><li><img src="assets/sponsor-midamerican.png" width="92" height="60" alt="MidAmerican Energy" loading="lazy"></li></ul></div>
 </div>
 </section>
 
