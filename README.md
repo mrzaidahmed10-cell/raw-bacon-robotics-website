@@ -9,7 +9,7 @@ Static site for FIRST Tech Challenge team 8743 (Iowa City High School). No build
 - `public/js/site.js`: rail pin, reveals, counters, countdown, photo hotspots
 - `public/js/scenes.js`: the hero intro. A three.js scene (r187, vendored in `public/js/vendor/`, MIT) drops a machined aluminum gear that bounces onto the stem of the dotless "ı" in "Robotics" and stays there as its dot. `site.js` measures where the stem is, so the gear lands exactly on the type; the title then rises out of its masks, nearest letters first. Click, key or scroll skips it. It is skipped (final state shown) with reduced motion and when you arrive from another page of the site. Without WebGL a plain red dot is used.
 - The robot photo is not in the hero: the section below it (`.robot-pop`) is scroll-linked and the photo rises into view as you scroll, then the callouts draw.
-- `public/assets/`: photos, logos, social card, and fonts (all SIL OFL, licenses included): Archivo (headlines and big numerals), IBM Plex Sans (reading text, navigation, buttons) and IBM Plex Mono (labels, dates, stats, callouts). Roles are listed at the end of `styles.css`.
+- `public/assets/`: photos, logos, social card, and fonts (all SIL OFL, licenses included): Archivo (headlines and big numerals), IBM Plex Sans (reading text, navigation, buttons) and IBM Plex Mono (labels, dates, stats, callouts), plus Caveat for the single handwritten note on the Robot page. Roles are listed at the end of `styles.css`.
 
 ## Common edits
 
@@ -47,4 +47,11 @@ Each technique is used at most twice, and most text is static on purpose.
 - Word mask-rise (`data-t="mask"`): the robot section heading on Home and "How a robot gets made" on the Robot page (2 uses)
 - Horizontal clip wipe (`data-t="wipe"`): the hero intro text and buttons, and "Built with help." on Home (2 uses)
 - Numbers: the countdown odometer (1), and count-up on two season tiles (2)
-- Robot page diagram: labels fade in as the leader lines draw (1 use)
+- Robot page diagram: labels fade in as the leader lines draw (1 use), and a hand-drawn circle around the number plate draws itself (stroke, not text)
+
+## Layout notes
+
+- Home: hero, scroll-linked robot section, a bento block (countdown tile, season opener, four stats, with an outlined "8743" cropped off the corner), awards beside a sticky heading, a photo that bleeds off the left edge, and a sponsors band with a slanted top edge. Most sections have no small label above the heading on purpose.
+- Robot page: the diagram labels highlight their part on hover, and a drafting-style spec sheet lists only facts the team has confirmed. Add rows (weight, dimensions, motor count) in the `dl.sheet` in `robot.html` when you have them.
+- The footer starts with a title block, like the corner of an engineering drawing.
+- Shop images are SVG mockups (knit ribbing, fabric grain, stitching). Replace the `.art` SVGs with real product photos when you have them.

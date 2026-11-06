@@ -194,11 +194,15 @@
         var x2 = ir.left - dr.left + ir.width * parseFloat(p.dataset.x) / 100, y2 = ir.top - dr.top + ir.height * parseFloat(p.dataset.y) / 100;
         var mx = x1 + (left ? 28 : -28);
         var d = "M" + x1 + " " + y1 + " H" + mx + " L" + x2 + " " + y2;
+        var group = [];
         ["under", "over"].forEach(function (c) {
           var path = document.createElementNS(NS, "path"); path.setAttribute("d", d); path.setAttribute("class", "ld " + c);
-          path.style.setProperty("--i", i); svg.appendChild(path);
+          path.style.setProperty("--i", i); svg.appendChild(path); group.push(path);
           var len = path.getTotalLength(); path.style.setProperty("--len", len);
         });
+        var dotc = document.createElementNS(NS, "circle"); dotc.setAttribute("cx", x2); dotc.setAttribute("cy", y2); dotc.setAttribute("r", 5); dotc.setAttribute("class", "ld-dot"); svg.appendChild(dotc); group.push(dotc);
+        var on = function () { group.forEach(function (g) { g.classList.add("hl"); }); }, off = function () { group.forEach(function (g) { g.classList.remove("hl"); }); };
+        p.onmouseenter = on; p.onmouseleave = off;
       });
       if (diagram.classList.contains("is-in")) svg.classList.add("on");
     };

@@ -28,22 +28,34 @@ function gearGeometry(N, R, thick) {
   return g;
 }
 
-/* faint horizontal brushing, as left by a belt sander on cut plate */
-function brushed(renderer) {
-  const S = 512, c = document.createElement("canvas"); c.width = c.height = S;
-  const x = c.getContext("2d"); x.fillStyle = "#6a6a6a"; x.fillRect(0, 0, S, S);
-  for (let i = 0; i < 2600; i++) {
-    const v = 90 + Math.random() * 90 | 0; x.fillStyle = "rgba(" + v + "," + v + "," + v + "," + (0.1 + Math.random() * 0.25) + ")";
-    x.fillRect(Math.random() * S, Math.random() * S, 40 + Math.random() * 260, 1);
+/* surface maps for the gear: belt-sander brushing, a few scratches, and darker, dirtier teeth than the web of the gear.
+   Gear UVs are the raw x/y in gear radii, so a single 0..1 tile covers x,y from -1 to 1 (see the repeat/offset below). */
+function surface(renderer) {
+  const S = 1024, mk = () => { const c = document.createElement("canvas"); c.width = c.height = S; return c; };
+  const rc = mk(), ac = mk(), rx = rc.getContext("2d"), ax = ac.getContext("2d");
+  rx.fillStyle = "#707070"; rx.fillRect(0, 0, S, S);
+  for (let i = 0; i < 5200; i++) {
+    const v = 90 + Math.random() * 100 | 0; rx.fillStyle = "rgba(" + v + "," + v + "," + v + "," + (0.1 + Math.random() * 0.25) + ")";
+    rx.fillRect(Math.random() * S, Math.random() * S, 60 + Math.random() * 380, 1);
   }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  return t;
+  /* a handful of deeper scratches at slightly different angles */
+  for (let i = 0; i < 26; i++) {
+    rx.strokeStyle = "rgba(235,235,235," + (0.25 + Math.random() * 0.4) + ")"; rx.lineWidth = 0.6 + Math.random() * 0.8;
+    const x = Math.random() * S, y = Math.random() * S, a = (Math.random() - 0.5) * 0.7, l = 80 + Math.random() * 260;
+    rx.beginPath(); rx.moveTo(x, y); rx.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); rx.stroke();
+  }
+  const g = ax.createRadialGradient(S / 2, S / 2, S * 0.18, S / 2, S / 2, S * 0.5);
+  g.addColorStop(0, "#d9dbe0"); g.addColorStop(0.62, "#c9ccd2"); g.addColorStop(0.86, "#a9aaae"); g.addColorStop(1, "#8d8c8c");
+  ax.fillStyle = g; ax.fillRect(0, 0, S, S);
+  for (let i = 0; i < 900; i++) { ax.fillStyle = "rgba(40,36,30," + Math.random() * 0.06 + ")"; ax.beginPath(); ax.arc(Math.random() * S, Math.random() * S, 2 + Math.random() * 9, 0, 6.3); ax.fill(); }
+  const tex = (c, srgb) => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(0.5, 0.5); t.offset.set(0.5, 0.5); t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; };
+  return { rough: tex(rc, false), albedo: tex(ac, true) };
 }
 
 export function dot(host, opts) {
   const still = !!opts.still, measure = opts.measure;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
   renderer.setClearColor(0x000000, 0);
@@ -64,7 +76,8 @@ export function dot(host, opts) {
   const t0 = measure();
   let R = t0.R;
   const THICK = () => R * 0.2;
-  const al = new THREE.MeshStandardMaterial({ color: 0xb9bdc4, metalness: 1, roughness: 0.36, roughnessMap: brushed(renderer) });
+  const sf = surface(renderer);
+  const al = new THREE.MeshStandardMaterial({ color: 0xe2e2e2, map: sf.albedo, metalness: 1, roughness: 0.62, roughnessMap: sf.rough, bumpMap: sf.rough, bumpScale: 0.6 });
   const steel = new THREE.MeshStandardMaterial({ color: 0xd6d8dc, metalness: 1, roughness: 0.22 });
   const red = new THREE.MeshStandardMaterial({ color: 0x6f0a0e, metalness: 0.7, roughness: 0.45 });
   const spin = new THREE.Group(), tilt = new THREE.Group(), pos = new THREE.Group();
@@ -83,9 +96,7 @@ export function dot(host, opts) {
     const r = host.getBoundingClientRect(); W = Math.max(1, r.width); H = Math.max(1, r.height);
     renderer.setSize(W, H, false); camera.aspect = W / H;
     dist = H / 2 / Math.tan((camera.fov * Math.PI) / 360); camera.position.set(0, 0, dist); camera.near = dist * 0.2; camera.far = dist * 4; camera.updateProjectionMatrix();
-    roughRepeat();
   };
-  const roughRepeat = () => { al.roughnessMap.repeat.set(0.5, 0.5); };
   resize();
 
   /* state in DOM pixel space (y down) */
