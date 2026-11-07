@@ -143,9 +143,10 @@
       $(".ch", title).forEach(function (c) {
         var r = c.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - cx, (r.top - cy) * 1.4);
         c.style.setProperty("--d", Math.round(d / Math.max(600, hr.width) * 650) + "ms");
+        c.style.setProperty("--s", r.left + r.width / 2 < cx ? -1 : 1);
       });
       hero.classList.add("is-hit");
-      if (!instant) { typeOut(eb, 500); setTimeout(introOver, 1500); } else introOver();
+      if (!instant) { typeOut(eb, 500); setTimeout(introOver, 2300); } else introOver();
     };
     var measure = function () {
       var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), br = bl.getBoundingClientRect();
