@@ -14,11 +14,14 @@
 @font-face { font-family: "IBM Plex Mono"; src: url("assets/fonts/plex-mono-Regular.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "IBM Plex Mono"; src: url("assets/fonts/plex-mono-Medium.woff") format("woff"); font-weight: 500 700; font-style: normal; font-display: swap; }
 
+@font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif-Regular.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url("assets/fonts/instrument-serif-Italic.woff") format("woff"); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: "Caveat"; src: url("assets/fonts/caveat-var.woff") format("woff"); font-weight: 400 700; font-style: normal; font-display: swap; }
 
 :root {
   --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-serif: "Instrument Serif", "Times New Roman", serif;
   --f-hand: "Caveat", "Bradley Hand", cursive;
   --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --red: #d4161c;
@@ -67,9 +70,9 @@ p:last-child { margin-bottom: 0; }
 .on-dark .kicker, .sec-red .kicker { color: #fff; }
 
 /* ---------- Motion: kept to a few purposeful moments ---------- */
-/* headline words rise out of a mask (hero and page titles only) */
+/* headline words slide in sideways from behind a mask (used twice) */
 .js [data-t="mask"] .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
-.js [data-t="mask"] .wi { display: inline-block; transform: translateY(105%); transition: transform 0.9s var(--out); transition-delay: calc(var(--k, 0) * 60ms); }
+.js [data-t="mask"] .wi { display: inline-block; transform: translateX(-108%); transition: transform 0.85s var(--inout); transition-delay: calc(var(--k, 0) * 70ms); }
 .js [data-t="mask"].is-in .wi { transform: none; }
 /* photos and key blocks settle in once */
 .js [data-r="rise"] { opacity: 0; transform: translateY(16px); transition: opacity 0.7s var(--out), transform 0.7s var(--out); transition-delay: var(--d, 0ms); }
@@ -171,6 +174,7 @@ p:last-child { margin-bottom: 0; }
   .hero .eyebrow { font-size: 0.68rem; letter-spacing: 0.12em; min-height: 2.5em; }
 }
 .js .hero-title .ch { transform: translateY(120%); }
+.js .hero-title .ln:first-child .ch { transform: translateY(-120%); }
 .js .hero.is-stem .hero-title .ix { transform: none; transition: transform 0.55s cubic-bezier(0.3, 0.7, 0.2, 1); }
 .js .hero.is-hit .hero-title .ch:not(.ix) { transform: none; transition: transform 0.95s var(--out); transition-delay: var(--d, 0ms); }
 .hero-sub { margin-top: clamp(1.5rem, 4.5vw, 3.2rem); display: grid; gap: 1.5rem; align-items: end; }
@@ -179,6 +183,16 @@ p:last-child { margin-bottom: 0; }
 .hero-sub .actions { margin: 0; }
 .hero .btn-line { color: #fff; border-color: rgba(255, 255, 255, 0.7); }
 .hero .btn-line:hover { background: #fff; color: var(--ink); border-color: #fff; }
+ /* intro */
+.js .hero:not(.is-hit) .eyebrow { opacity: 0; }
+.js.intro-on .site-header, .js.intro-on .rail { opacity: 0; pointer-events: none; }
+.js .site-header, .js .rail { transition: transform 0.45s var(--out), box-shadow 0.3s, opacity 1s var(--out); }
+.datum { position: absolute; z-index: 1; left: 0; right: 0; top: var(--oy, 40%); height: 1px; pointer-events: none; opacity: 0; transform-origin: var(--ox, 50%) 0; background: linear-gradient(90deg, transparent, rgba(226, 30, 38, 0.7) 12%, rgba(226, 30, 38, 0.7) 88%, transparent); transform: scaleX(0); transition: transform 1.3s var(--inout) 0.35s, opacity 0.4s 0.35s; }
+.js .hero.is-hit .datum { transform: scaleX(1); opacity: 1; }
+.no-js .datum { display: none; }
+.skip-intro { position: absolute; z-index: 5; left: var(--pad, 1.25rem); bottom: 1.5rem; font: 500 0.72rem/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: #8d8d93; background: none; border: 0; border-bottom: 1px solid #55555a; padding: 0.4rem 0; cursor: pointer; opacity: 0; animation: skipin 0.6s 1s forwards; transition: color 0.2s, border-color 0.2s; }
+.skip-intro:hover, .skip-intro:focus-visible { color: #fff; border-color: var(--red); }
+@keyframes skipin { to { opacity: 1; } }
 .hero-gl { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
 /* no WebGL: a plain red dot stands in for the gear */
 .hero.no-gl .ln { overflow: visible; }
@@ -568,3 +582,9 @@ p:last-child { margin-bottom: 0; }
 .parts-col:hover .part:not(:hover) { opacity: 0.55; }
 @media (prefers-reduced-motion: reduce) { .mark path, .hand, .ld-dot { transition: none !important; } .parts-col:hover .part:not(:hover) { opacity: 1; } }
 @media (max-width: 51.99rem) { .tb div:last-child { grid-column: 1 / -1; } }
+
+/* editorial headings: serif for section titles, Archivo stays on the hero, page titles and numerals */
+h2 { font-family: var(--f-serif); font-weight: 400; font-stretch: 100%; letter-spacing: -0.012em; line-height: 1.02; font-size: clamp(2.3rem, 5.2vw, 4.6rem); }
+h2 em { font-style: italic; color: var(--red); }
+.on-dark h2 em, .slant h2 em { color: inherit; }
+@media (prefers-reduced-motion: reduce) { .datum { transition: none; } .skip-intro { display: none; } .js.intro-on .site-header, .js.intro-on .rail { opacity: 1; pointer-events: auto; } }

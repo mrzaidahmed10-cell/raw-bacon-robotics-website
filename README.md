@@ -42,9 +42,9 @@ The previous design is in git history at commit 8242c5e if you ever want to roll
 
 Each technique is used at most twice, and most text is static on purpose.
 
-- Hero title: letters rise out of line masks from the gear outward (1 use)
+- Hero title: line one lowers from above and line two rises from below, each letter starting as the shock reaches it from the gear (1 use)
 - Hero eyebrow: typed readout (1 use)
-- Word mask-rise (`data-t="mask"`): the robot section heading on Home and "How a robot gets made" on the Robot page (2 uses)
+- Word slide (`data-t="mask"`, words slide sideways out of a mask): the robot section heading on Home and "How a robot gets made" on the Robot page (2 uses)
 - Horizontal clip wipe (`data-t="wipe"`): the hero intro text and buttons, and "Built with help." on Home (2 uses)
 - Numbers: the countdown odometer (1), and count-up on two season tiles (2)
 - Robot page diagram: labels fade in as the leader lines draw (1 use), and a hand-drawn circle around the number plate draws itself (stroke, not text)
@@ -55,3 +55,11 @@ Each technique is used at most twice, and most text is static on purpose.
 - Robot page: the diagram labels highlight their part on hover, and a drafting-style spec sheet lists only facts the team has confirmed. Add rows (weight, dimensions, motor count) in the `dl.sheet` in `robot.html` when you have them.
 - The footer starts with a title block, like the corner of an engineering drawing.
 - Shop images are SVG mockups (knit ribbing, fabric grain, stitching). Replace the `.art` SVGs with real product photos when you have them.
+
+## Hero assembly intro
+
+`public/js/scenes.js` (three.js, home page only): near-black screen, lights ramp up; a machined aluminum gear drops onto the stem of the "i" and bounces, a 9-tooth pinion is thrown in and meshes with it (tooth phase is solved so the teeth interleave), a red washer settles like a coin, and a black-oxide socket-head bolt swings in and threads down. When the bolt seats, `onComplete` fires: the title reveals from the gear outward, a red datum line draws across the page at the gear axis, the eyebrow types out, the subtitle wipes in and the header and rail fade in. Any click, key, wheel or the "Skip intro" button jumps to the end; reduced motion, same-site navigation and no-WebGL skip or simplify it. The parts are generic machined shapes, not a model of the team robot.
+
+## Type roles
+
+Archivo (hero, page titles, numerals), Instrument Serif (section headings, italic accents), IBM Plex Sans (body), IBM Plex Mono (technical labels), Caveat (one hand-written note). All self-hosted, OFL licenses in `public/assets/fonts/`.

@@ -114,20 +114,30 @@
     if (reduce) return;
     el.textContent = ""; el.classList.add("typing"); el.setAttribute("aria-label", full);
     var i = 0, step = function () {
+      if (el._stop) return;
       el.textContent = full.slice(0, ++i);
       if (i < full.length) setTimeout(step, 22 + Math.random() * 26); else el.classList.remove("typing");
     };
     setTimeout(step, delay);
   }
 
-  /* Hero intro: a machined gear falls onto the "i" in Robotics and becomes its dot; the title then rises out of its masks from that point */
+  /* Hero intro: a gear drops onto the "i" in Robotics, a pinion meshes with it, a washer settles and a bolt threads in.
+     When the bolt seats, the title opens from that point: line one lowers from above, line two rises from below, each letter starting as the shock reaches it. */
   if (hero && hero.hasAttribute("data-hero")) {
-    var title = hero.querySelector(".hero-title"), ix = title.querySelector(".ix"), bl = title.querySelector(".bl"), eb = hero.querySelector(".eyebrow");
+    var title = hero.querySelector(".hero-title"), ix = title.querySelector(".ix"), bl = title.querySelector(".bl"), eb = hero.querySelector(".eyebrow"), datum = hero.querySelector(".datum");
     var navType = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] || {}).type;
     var fromSite = navType === "navigate" && document.referrer && (function () { try { return new URL(document.referrer).origin === location.origin; } catch (e) { return false; } })();
     var instant = reduce || fromSite;
+    var root = document.documentElement, skipBtn = null, safety = 0;
+    var introOver = function () { root.classList.remove("intro-on"); if (skipBtn) { skipBtn.remove(); skipBtn = null; } clearTimeout(safety); };
+    var place = function () {
+      var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), br = bl.getBoundingClientRect(), fs = parseFloat(getComputedStyle(title).fontSize);
+      hero.style.setProperty("--ox", Math.round(ir.left + ir.width / 2 + fs * 0.0225 - hr.left) + "px");
+      hero.style.setProperty("--oy", Math.round(br.top - hr.top - fs * 0.526 - fs * (innerWidth < 640 ? 0.24 : 0.27)) + "px");
+    };
     var markHit = function () {
       if (hero.classList.contains("is-hit")) return;
+      place();
       /* each letter starts as the shock reaches it: nearest to the gear first */
       var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), cx = ir.left + ir.width / 2, cy = ir.top;
       $(".ch", title).forEach(function (c) {
@@ -135,6 +145,7 @@
         c.style.setProperty("--d", Math.round(d / Math.max(600, hr.width) * 650) + "ms");
       });
       hero.classList.add("is-hit");
+      if (!instant) { typeOut(eb, 500); setTimeout(introOver, 1500); } else introOver();
     };
     var measure = function () {
       var hr = hero.getBoundingClientRect(), ir = ix.getBoundingClientRect(), br = bl.getBoundingClientRect();
@@ -142,21 +153,31 @@
       return { x: ir.left + ir.width / 2 + fs * 0.0225 - hr.left, stemY: br.top - hr.top - fs * 0.526, R: fs * (innerWidth < 640 ? 0.24 : 0.27) };
     };
     var ctl = null, started = false;
-    var finish = function () { if (ctl) ctl.finish(); hero.classList.add("is-instant", "is-stem", "is-hit"); if (eb && eb.classList.contains("typing")) { eb.classList.remove("typing"); eb.textContent = eb.getAttribute("aria-label"); } };
+    var finish = function () {
+      if (ctl) ctl.finish();
+      hero.classList.add("is-instant", "is-stem"); markHit(); hero.classList.add("is-hit");
+      if (eb) eb._stop = true;
+      if (eb && eb.classList.contains("typing")) { eb.classList.remove("typing"); eb.textContent = eb.getAttribute("aria-label"); }
+      introOver();
+    };
     var begin = function () {
       if (started) return; started = true;
-      if (!gl()) { hero.classList.add("no-gl"); if (instant) { finish(); return; } setTimeout(function () { hero.classList.add("is-stem"); }, 300); setTimeout(markHit, 900); return; }
+      if (!gl()) { hero.classList.add("no-gl"); if (instant) { finish(); return; } setTimeout(function () { hero.classList.add("is-stem"); }, 300); setTimeout(markHit, 1100); return; }
       import("./scenes.js").then(function (m) {
-        ctl = m.dot(hero, { still: instant, measure: measure, onStem: function () { hero.classList.add("is-stem"); }, onHit: markHit });
+        ctl = m.dot(hero, { still: instant, measure: measure, onStem: function () { hero.classList.add("is-stem"); }, onComplete: markHit });
         if (instant) finish();
         else {
-          var skip = function () { removeEventListener("pointerdown", skip); removeEventListener("keydown", skip); finish(); };
+          var skip = function () { removeEventListener("pointerdown", skip); removeEventListener("keydown", skip); removeEventListener("wheel", skip); finish(); };
           addEventListener("pointerdown", skip); addEventListener("keydown", skip);
-          addEventListener("wheel", skip, { once: true, passive: true });
+          addEventListener("wheel", skip, { passive: true });
+          skipBtn = document.createElement("button"); skipBtn.type = "button"; skipBtn.className = "skip-intro"; skipBtn.textContent = "Skip intro";
+          skipBtn.addEventListener("click", function (e) { e.stopPropagation(); skip(); });
+          hero.appendChild(skipBtn);
         }
-      }).catch(function () { hero.classList.add("no-gl"); if (instant) finish(); else { hero.classList.add("is-stem"); setTimeout(markHit, 500); } });
+      }).catch(function () { hero.classList.add("no-gl"); if (instant) finish(); else { hero.classList.add("is-stem"); setTimeout(markHit, 600); } });
     };
-    if (instant) hero.classList.add("is-instant"); else typeOut(eb, 150);
+    if (instant) { hero.classList.add("is-instant"); root.classList.remove("intro-on"); }
+    else { safety = setTimeout(function () { if (!hero.classList.contains("is-hit")) finish(); introOver(); }, 16000); }
     var ready = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 1500); })]) : Promise.resolve();
     ready.then(function () { requestAnimationFrame(begin); });
   }

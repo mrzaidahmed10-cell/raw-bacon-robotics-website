@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/plex-sans-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add("js")</script>
-<link rel="modulepreload" href="js/scenes.js"><link rel="modulepreload" href="js/vendor/three.module.js"><link rel="modulepreload" href="js/vendor/three.core.js"><link rel="modulepreload" href="js/vendor/RoomEnvironment.js">
+<script>if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-on")</script><link rel="modulepreload" href="js/scenes.js"><link rel="modulepreload" href="js/vendor/three.module.js"><link rel="modulepreload" href="js/vendor/three.core.js"><link rel="modulepreload" href="js/vendor/RoomEnvironment.js">
 </head>
 <body class="home">
 <a class="skip" href="#main">Skip to content</a>
@@ -32,6 +32,7 @@
 
 <section class="hero" aria-labelledby="h1" data-hero>
 <div class="hero-bg" aria-hidden="true"></div>
+<span class="datum" aria-hidden="true"></span>
 <div class="wrap hero-in">
 <p class="eyebrow" data-t="read">FIRST Tech Challenge · Team 8743 · Since 2014</p>
 <h1 id="h1" class="hero-title" aria-label="Raw Bacon Robotics"><span class="ln" aria-hidden="true"><span class="wd"><span class="ch">R</span><span class="ch">a</span><span class="ch">w</span></span> <span class="wd"><span class="ch">B</span><span class="ch">a</span><span class="ch">c</span><span class="ch">o</span><span class="ch">n</span></span></span><span class="ln" aria-hidden="true"><span class="ch">R</span><span class="ch">o</span><span class="ch">b</span><span class="ch">o</span><span class="ch">t</span><span class="ch ix">ı</span><span class="bl"></span><span class="ch">c</span><span class="ch">s</span></span></h1>
@@ -42,7 +43,7 @@
 <section class="robot-pop on-dark" id="robot" data-pop aria-labelledby="rp-h">
 <div class="rp-stick">
 <div class="wrap rp-grid">
-<div class="rp-copy"><h2 id="rp-h" data-t="mask">Built by students, bolt by bolt.</h2><p class="lead">Perforated aluminum channel, mecanum wheels and wiring the team routes itself. Every part on it was designed, built or chosen by students.</p><div class="actions"><a class="btn" href="robot.html">See it part by part</a></div></div>
+<div class="rp-copy"><h2 id="rp-h" data-t="mask">Built by students, <em>bolt by bolt.</em></h2><p class="lead">Perforated aluminum channel, mecanum wheels and wiring the team routes itself. Every part on it was designed, built or chosen by students.</p><div class="actions"><a class="btn" href="robot.html">See it part by part</a></div></div>
 <figure class="rp-fig"><div class="frame"><img src="assets/robot.webp" width="915" height="1237" loading="lazy" alt="Our robot on the pit cart: aluminum channel frame, a drive motor with wiring, the blue 8743 number plate and a yellow mecanum wheel">
 <div class="callouts" aria-hidden="true">
 <span class="co" style="--x:22;--y:17;--h:46px;--c:0"><i></i><b>Drive motor</b></span>
@@ -99,7 +100,7 @@
 <div class="wrap work-grid">
 <figure class="photo work-photo" data-r="rise" style="--d:0ms"><img src="assets/team-build.webp" width="1100" height="1467" alt="A student tightening hardware with a hex key on the robot frame, next to a mecanum wheel and a bin of wire" loading="lazy"><figcaption>Assembling the frame in the shop.</figcaption></figure>
 <div class="work-copy">
-<h2 id="do-h">Three jobs, one team.</h2>
+<h2 id="do-h">Three jobs, <em>one team.</em></h2>
 <ol class="jobs">
 <li><span class="idx">01</span><div><h3>Build</h3><p>We design in Onshape, prototype quickly and rebuild whatever does not hold up. Drivetrain and intake get revised until they do.</p></div></li>
 <li><span class="idx">02</span><div><h3>Program</h3><p>Java on the REV Control Hub. Odometry-based autonomous, tuned PID, and telemetry we use in driver practice.</p></div></li>
@@ -111,7 +112,7 @@
 
 <section class="sec sec-red slant" aria-labelledby="sp-h">
 <div class="wrap sponsor-big">
-<div><h2 id="sp-h" data-t="wipe">Built with help.</h2><p class="lead" style="margin-top:1.25rem">Sponsorship pays for parts, registration and travel. A mentor with engineering, software, machining or business experience can change a season with an hour a week.</p><div class="actions"><a class="btn" href="sponsors.html">Support the team</a></div></div>
+<div><h2 id="sp-h" data-t="wipe">Built with <em>help.</em></h2><p class="lead" style="margin-top:1.25rem">Sponsorship pays for parts, registration and travel. A mentor with engineering, software, machining or business experience can change a season with an hour a week.</p><div class="actions"><a class="btn" href="sponsors.html">Support the team</a></div></div>
 <div><p class="kicker-s">Our sponsors</p><ul class="sponsor-logos"><li><img src="assets/sponsor-rtx.png" width="169" height="70" alt="RTX" loading="lazy"></li><li><img src="assets/sponsor-midamerican.png" width="92" height="60" alt="MidAmerican Energy" loading="lazy"></li></ul></div>
 </div>
 </section>
